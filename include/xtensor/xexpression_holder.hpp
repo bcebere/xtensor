@@ -10,9 +10,9 @@
 #ifndef XTENSOR_XEXPRESSION_HOLDER_HPP
 #define XTENSOR_XEXPRESSION_HOLDER_HPP
 
-#include <nlohmann/json.hpp>
 #include <memory>
 
+#include "nlohmann/json.hpp"
 #include "xtl/xany.hpp"
 
 #include "xarray.hpp"

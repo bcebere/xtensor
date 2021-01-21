@@ -14,8 +14,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include <nlohmann/json.hpp>
-
+#include "nlohmann/json.hpp"
 #include "xstrided_view.hpp"
 #include "xtensor_config.hpp"
 
