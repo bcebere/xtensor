@@ -365,46 +365,46 @@ namespace detail {
     }
 }
 
-#define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, INIT_VALUE_TYPE, INIT)                                            \
-    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>             \
-    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                 \
-        using functor_type = FUNCTOR;                                                                             \
-        using init_value_fct = xt::const_value<result_type>;                                                      \
-        return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
-                          init_value_fct(detail::fill_init<result_type>(INIT))),                                  \
-                          std::forward<E>(e),                                                                     \
-                          std::forward<X>(axes), es);                                                             \
-    }                                                                                                             \
-                                                                                                                  \
-    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>                            \
-    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                               \
-    {                                                                                                             \
-        return NAME(std::forward<E>(e), {axis}, es);                                                              \
-    }                                                                                                             \
-                                                                                                                  \
-    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
-              XTL_REQUIRES(is_reducer_options<EVS>)>                                                              \
-    inline auto NAME(E&& e, EVS es = EVS())                                                                       \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                 \
-        using functor_type = FUNCTOR;                                                                             \
-        using init_value_fct = xt::const_value<result_type>;                                                      \
-        return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
-                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), es);         \
-    }                                                                                                             \
-                                                                                                                  \
-    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
-    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                 \
-        using functor_type = FUNCTOR;                                                                             \
-        using init_value_fct = xt::const_value<result_type>;                                                      \
-        return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
-                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), axes, es);   \
+#define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, INIT_VALUE_TYPE, INIT)                                               \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                               \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>                \
+    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                                \
+    {                                                                                                                \
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                \
+        using functor_type = FUNCTOR;                                                                                \
+        using init_value_fct = xt::const_value<init_value_type>;                                                     \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
+                          init_value_fct(detail::fill_init<init_value_type>(INIT))),                                 \
+                          std::forward<E>(e),                                                                        \
+                          std::forward<X>(axes), es);                                                                \
+    }                                                                                                                \
+                                                                                                                     \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                               \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>                               \
+    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                                  \
+    {                                                                                                                \
+        return NAME(std::forward<E>(e), {axis}, es);                                                                 \
+    }                                                                                                                \
+                                                                                                                     \
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                        \
+              XTL_REQUIRES(is_reducer_options<EVS>)>                                                                 \
+    inline auto NAME(E&& e, EVS es = EVS())                                                                          \
+    {                                                                                                                \
+        using init_value_type  = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;               \
+        using functor_type = FUNCTOR;                                                                                \
+        using init_value_fct = xt::const_value<init_value_type >;                                                    \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
+                          init_value_fct(detail::fill_init<init_value_type >(INIT))), std::forward<E>(e), es);       \
+    }                                                                                                                \
+                                                                                                                     \
+    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                \
+    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                      \
+    {                                                                                                                \
+        using init_value_type  = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;               \
+        using functor_type = FUNCTOR;                                                                                \
+        using init_value_fct = xt::const_value<init_value_type >;                                                    \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
+                          init_value_fct(detail::fill_init<init_value_type >(INIT))), std::forward<E>(e), axes, es); \
     }
 
     /*******************
@@ -1839,9 +1839,13 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
      * @param es evaluation strategy of the reducer
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() + E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(sum, detail::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
+    XTENSOR_REDUCER_FUNCTION(sum, detail::plus, typename std::decay_t<E>::value_type, 0)
 
     /**
      * @ingroup red_functions
@@ -1855,9 +1859,13 @@ namespace detail {
      *             The divisor used in calculations is N - ddof, where N represents the number of
                    elements. By default ddof is zero.
      * @param es evaluation strategy of the reducer
+     * @tparam T the value type used for internal computation. The default is `E::value_type`.
+     *           `T` is also used for determining the value type of the result, which is the type
+     *           of `T() * E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(prod, detail::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
+    XTENSOR_REDUCER_FUNCTION(prod, detail::multiplies, typename std::decay_t<E>::value_type, 1)
 
     namespace detail
     {
@@ -1890,7 +1898,7 @@ namespace detail {
             const size_type size = e.size();
             XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
             auto s = sum<T>(std::forward<E>(e), axes, es);
-            return detail::mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
+            return mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
         }
 
         template <class T, class E, class D, class EVS,
@@ -1898,8 +1906,11 @@ namespace detail {
         inline auto mean_noaxis(E&& e, const D& ddof, EVS es)
         {
             using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-            const auto size = e.size();
-            return sum<T>(std::forward<E>(e), es) / static_cast<value_type>(size - ddof);
+            using size_type = typename std::decay_t<E>::size_type;
+            const size_type size = e.size();
+            XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
+            auto s = sum<T>(std::forward<E>(e), es);
+            return std::move(s) / static_cast<value_type>((size - static_cast<size_type>(ddof)));
         }
     }
 
@@ -1912,6 +1923,10 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the mean is computed (optional)
      * @param es the evaluation strategy (optional)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() + E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xexpression
      */
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -1943,11 +1958,15 @@ namespace detail {
      * @param e an \ref xexpression
      * @param weights \ref xexpression containing weights associated with the values in \ref e
      * @param axes the axes along which the mean is computed (optional)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T`is also used for determining the value type of the result,
+     *           which is the type of `T() + E::value_type().
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xexpression
      *
      * @sa mean
      */
-    template <class E, class W, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+    template <class T = void, class E, class W, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_reducer_options<EVS>, xtl::negation<xtl::is_integral<X>>)>
     inline auto average(E&& e, W&& weights, X&& axes, EVS ev = EVS())
     {
@@ -1976,19 +1995,19 @@ namespace detail {
 
         constexpr layout_type L = default_assignable_layout(std::decay_t<W>::static_layout);
         auto weights_view = reshape_view<L>(std::forward<W>(weights), std::move(broadcast_shape));
-        auto scl = sum(weights_view, ax, xt::evaluation_strategy::immediate);
-        return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
+        auto scl = sum<T>(weights_view, ax, xt::evaluation_strategy::immediate);
+        return sum<T>(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }
 
-    template <class E, class W, class X, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class T = void, class E, class W, class X, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto average(E&& e, W&& weights, const X(&axes)[N], EVS ev = EVS())
     {
         // need to select the X&& overload and forward to different type
         using ax_t = std::array<std::size_t, N>;
-        return average(std::forward<E>(e), std::forward<W>(weights), xt::forward_normalize<ax_t>(e, axes), ev);
+        return average<T>(std::forward<E>(e), std::forward<W>(weights), xt::forward_normalize<ax_t>(e, axes), ev);
     }
 
-    template <class E, class W, class EVS = DEFAULT_STRATEGY_REDUCERS,
+    template <class T = void, class E, class W, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto average(E&& e, W&& weights, EVS ev = EVS())
     {
@@ -1997,15 +2016,15 @@ namespace detail {
             XTENSOR_THROW(std::runtime_error, "Weights need to have the same shape as expression.");
         }
 
-        auto div = sum(weights, evaluation_strategy::immediate)();
-        auto s = sum(std::forward<E>(e) * std::forward<W>(weights), ev) / std::move(div);
+        auto div = sum<T>(weights, evaluation_strategy::immediate)();
+        auto s = sum<T>(std::forward<E>(e) * std::forward<W>(weights), ev) / std::move(div);
         return s;
     }
 
-    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_reducer_options<EVS>)>
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto average(E&& e, EVS ev = EVS())
     {
-        return mean(e, ev);
+        return mean<T>(e, ev);
     }
 
     namespace detail
@@ -2044,7 +2063,6 @@ namespace detail {
               XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto stddev(E&& e, EVS es = EVS())
     {
-        using result_type = std::conditional_t<std::is_same<T, void>::value, double, T>;
         return sqrt(variance<T>(std::forward<E>(e), es));
     }
 
@@ -2064,6 +2082,10 @@ namespace detail {
      *             The divisor used in calculations is N - ddof, where N represents the number of
                    elements. By default ddof is zero.
      * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T`is also used for determining the value type of the result,
+     *           which is the type of `T() + E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xexpression
      *
      * @sa stddev, mean
@@ -2109,6 +2131,10 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the standard deviation is computed (optional)
      * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T`is also used for determining the value type of the result,
+     *           which is the type of `T() + E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xexpression
      *
      * @sa variance, mean
@@ -2197,22 +2223,26 @@ namespace detail {
      * \em axis (or flattened).
      * @param e an \ref xexpression
      * @param axis the axes along which the cumulative sum is computed (optional)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T`is also used for determining the value type of the result,
+     *           which is the type of `T() + E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xarray<T>
      */
-    template <class E>
+    template <class T = void, class E>
     inline auto cumsum(E&& e, std::ptrdiff_t axis)
     {
-        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::plus(), detail::accumulator_identity<result_type>()), 
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
+        return accumulate(make_xaccumulator_functor(detail::plus(), detail::accumulator_identity<init_value_type>()), 
                           std::forward<E>(e),
                           axis);
     }
 
-    template <class E>
+    template <class T = void, class E>
     inline auto cumsum(E&& e)
     {
-        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::plus(), detail::accumulator_identity<result_type>()), 
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
+        return accumulate(make_xaccumulator_functor(detail::plus(), detail::accumulator_identity<init_value_type>()), 
                           std::forward<E>(e));
     }
 
@@ -2224,22 +2254,26 @@ namespace detail {
      * \em axis (or flattened).
      * @param e an \ref xexpression
      * @param axis the axes along which the cumulative product is computed (optional)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T`is also used for determining the value type of the result,
+     *           which is the type of `T() * E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xarray<T>
      */
-    template <class E>
+    template <class T = void, class E>
     inline auto cumprod(E&& e, std::ptrdiff_t axis)
     {
-        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::multiplies(), detail::accumulator_identity<result_type>()), 
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
+        return accumulate(make_xaccumulator_functor(detail::multiplies(), detail::accumulator_identity<init_value_type>()), 
                           std::forward<E>(e), 
                           axis);
     }
 
-    template <class E>
+    template <class T = void, class E>
     inline auto cumprod(E&& e)
     {
-        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::multiplies(), detail::accumulator_identity<result_type>()), 
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
+        return accumulate(make_xaccumulator_functor(detail::multiplies(), detail::accumulator_identity<init_value_type>()), 
                           std::forward<E>(e));
     }
 
@@ -2323,37 +2357,6 @@ namespace detail {
         return detail::make_xfunction<detail::nan_to_num_functor>(std::forward<E>(e));
     }
 
-#define XTENSOR_NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                             \
-    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>                                                 \
-    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
-        using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e),         \
-                      std::forward<X>(axes), es);                                                                 \
-    }                                                                                                             \
-                                                                                                                  \
-    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
-              XTL_REQUIRES(is_reducer_options<EVS>)>                                                              \
-    inline auto NAME(E&& e, EVS es = EVS())                                                                       \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
-        using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), es);    \
-    }                                                                                                             \
-                                                                                                                  \
-    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
-    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
-        using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es);  \
-    }
-
     /**
      * @ingroup nan_functions
      * @brief Sum of elements over given axes, replacing nan with 0.
@@ -2363,6 +2366,10 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
      * @param es evaluation strategy of the reducer (optional)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() + E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xreducer
      */
     XTENSOR_REDUCER_FUNCTION(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0)
@@ -2376,11 +2383,13 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
      * @param es evaluation strategy of the reducer (optional)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() * E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xreducer
      */
     XTENSOR_REDUCER_FUNCTION(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1)
-
-#undef XTENSOR_NAN_REDUCER_FUNCTION
 
 #define COUNT_NON_ZEROS_CONTENT                                                             \
     using value_type = typename std::decay_t<E>::value_type;                                \
@@ -2469,20 +2478,24 @@ namespace detail {
      * \em axis, replacing nan with 0.
      * @param e an \ref xexpression
      * @param axis the axis along which the elements are accumulated (optional)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() + E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an xaccumulator
      */
-    template <class E>
+    template <class T = void, class E>
     inline auto nancumsum(E&& e, std::ptrdiff_t axis)
     {
-        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::nan_plus(), detail::nan_init<result_type, 0>()), std::forward<E>(e), axis);
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
+        return accumulate(make_xaccumulator_functor(detail::nan_plus(), detail::nan_init<init_value_type, 0>()), std::forward<E>(e), axis);
     }
 
-    template <class E>
+    template <class T = void, class E>
     inline auto nancumsum(E&& e)
     {
-        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::nan_plus(), detail::nan_init<result_type, 0>()), std::forward<E>(e));
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
+        return accumulate(make_xaccumulator_functor(detail::nan_plus(), detail::nan_init<init_value_type, 0>()), std::forward<E>(e));
     }
 
     /**
@@ -2493,20 +2506,24 @@ namespace detail {
      * \em axis, replacing nan with 1.
      * @param e an \ref xexpression
      * @param axis the axis along which the elements are accumulated (optional)
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() * E::value_type()`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an xaccumulator
      */
-    template <class E>
+    template <class T = void, class E>
     inline auto nancumprod(E&& e, std::ptrdiff_t axis)
     {
-        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::nan_multiplies(), detail::nan_init<result_type, 1>()), std::forward<E>(e), axis);
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
+        return accumulate(make_xaccumulator_functor(detail::nan_multiplies(), detail::nan_init<init_value_type, 1>()), std::forward<E>(e), axis);
     }
 
-    template <class E>
+    template <class T = void, class E>
     inline auto nancumprod(E&& e)
     {
-        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::nan_multiplies(), detail::nan_init<result_type, 1>()), std::forward<E>(e));
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
+        return accumulate(make_xaccumulator_functor(detail::nan_multiplies(), detail::nan_init<init_value_type, 1>()), std::forward<E>(e));
     }
 
     namespace detail
@@ -2553,6 +2570,8 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the mean is computed (optional)
      * @param es the evaluation strategy (optional)
+     * @tparam T the result type. The default is `E::value_type`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xexpression
      */
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -2615,6 +2634,8 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the variance is computed (optional)
      * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @tparam T the result type. The default is `E::value_type`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xexpression
      *
      * @sa nanstd, nanmean
@@ -2652,6 +2673,8 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the standard deviation is computed (optional)
      * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @tparam T the result type. The default is `E::value_type`.
+     *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xexpression
      *
      * @sa nanvar, nanmean
